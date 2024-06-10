@@ -1,17 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const Create = () => {
+const Edit = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("Male");
   const navigate = useNavigate();
+  const {id} = useParams();
 
-  const saveUser = async (e) => {
+  useEffect(() => {
+    getUserById();
+  }, []);
+
+  const updateUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/users", {
+      await axios.patch(`http://localhost:5000/users/${id}`, {
         name,
         email,
         gender,
@@ -22,10 +27,17 @@ const Create = () => {
     }
   };
 
+  const getUserById = async () => {
+    const response = await axios.get(`http://localhost:5000/users/${id}`);
+    setName(response.data.name);
+    setEmail(response.data.email);
+    setGender(response.data.gender);
+  };
+
   return (
     <div className='flex w-full justify-center items-center'>
       <div className='w-1/4 border bg-gray-200 text-gray-900 p-5'>
-        <form className='max-w-sm mx-auto' onSubmit={saveUser}>
+        <form className='max-w-sm mx-auto' onSubmit={updateUser}>
           <div className='mb-5'>
             <label
               htmlFor='name'
@@ -85,7 +97,7 @@ const Create = () => {
             type='submit'
             className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
           >
-            Submit
+            Update
           </button>
         </form>
       </div>
@@ -93,4 +105,4 @@ const Create = () => {
   );
 };
 
-export default Create;
+export default Edit;
